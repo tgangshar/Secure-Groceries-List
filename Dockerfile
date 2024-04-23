@@ -13,10 +13,10 @@ ENV TODO_API_IP=${api_ip}
 # Sending Port
 EXPOSE 80/tcp
 #COPY todolist.python .
-COPY FrntTodolist.py .
+COPY NFrntTodolist.py .
 #COPY BackTodolist.py .
 #COPY todolist.db .
 COPY templates/index.html templates/
 
 #starting the Front end server
-CMD python FrntTodolist.py
+CMD python NFrntTodolist.py
