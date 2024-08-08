@@ -1,0 +1,306 @@
+\documentclass{rapportCS}
+\usepackage{listings}
+\usepackage[skipbelow=\topskip,skipabove=\topskip]{mdframed}
+\mdfsetup{roundcorner=0}
+
+\usepackage{fancyvrb}
+% redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ %
+ frame=lines,  % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ label=\fbox{Bandit},
+ labelposition=topline,
+ %
+ commandchars=\|\(\), % escape character and argument delimiters for
+                      % commands within the verbatim
+ commentchar=*        % comment character
+}
+\providecommand{\keywords}[1]
+{
+  \small	
+  \textbf{\textit{Keywords---}} #1
+}
+\title{Scanning My Groceries List: \\ A Security Report} %Thanks for Rapport CentraleSupelec - Template, By Axel Poupart-Lafarge
+\begin{document}
+
+%----------- Informations du rapport ---------
+
+\logoentreprise{logos/FCC.jpg}
+
+\titre{Scanning My Groceries List: \\ A Security Report} % Titre du fichier
+
+\mention{Cybersecurity} % Nom de la Mention
+\trigrammemention{Fordham GSAS} % Pour le bas de la page
+\master{Master of Science} % Nom du master
+%\filiere{Filière Management de projet et Transformation} % Nom de la filière
+
+\eleve{Tenzin Gangshar}
+
+\dates{May 12 2023}
+
+
+%----------- Initialisation -------------------
+        
+\fairemarges %Afficher les marges
+\fairepagedegarde %Créer la page de garde
+
+
+%------------ Table des matières ----------------
+
+%\tabledematieres % Créer la table de matières
+
+%------------ Corps du rapport ----------------
+
+
+%------------ Introduction ----------------
+
+\hfill \break
+\begin{abstract}
+Cybersecurity is a challenging discipline to start from the ground up. Although there are vast amounts of tools and literature for securing applications and web products, it is difficult to completely secure your production at a satisfactory level. Our flask application was at its early phase and had various security flaws. Docker itself was raising various red flags. There are basic fundamentals such as user accounts, encryption, and more, that can grant applications a layer security, but perfect security is not guaranteed. The more sophisticate you make your application, the greater the attack surface. Security is not just about the technology but also the technique and implementation. There are frameworks, controls and way more supplementary policies that create a very secure environment, but require expertise. In our project, we used a vast array of tools to scan and determine the security vulnerabilities and exploited them. Since the application is at early stages and has yet to have any security provision, we aimed to secure it enough to see a noticeable difference when we run the scanners again. Security should not hinder the development of the application and its use. Usability is only encouraged when we keep goals holistic. \\ 
+\keywords [Cloud Computing, Static Code Analysis, Dynamic Code Analysis, Cross-Site-Scripting ]
+\end{abstract}
+\section{Introduction} 
+The migration to the cloud has been pervasive in today's IT infrastructure. Both the need for remote accommodations and general benefits of the cloud model has made the switch intuitive. We have already deployed our web application to the cloud with a front-end and a back-end server, but we do not have proper security in place yet. Although cloud provider offers great amount of security support such as IAM, MFA, encryption, and monitoring capabilities, IaaS does not handle any of the code customers may put into production and their data. Developers still need to test their production for code logic, and follow encryption standards. Companies on the cloud would still need to implement security frameworks and controls from NIST, ISO, CIS or other sources depending on their overall structure. We will be testing our application on various penetration testing methods. Then we will come up with mitigation that will at least alleviate some of the security stress.  
+\subsection{What is Cloud Computing}
+From my experience the key reason why cloud computing as a concept is so powerful is because of it ambiguous nature/definition. In the beginning of the class we went over two key topics that I believe is the core of cloud computing: virtualization and the Internet. The internet allows for cloud computing to have the feature of remoteness or ubiquity with the combination of any machine to interface and internet to connect. Second the virtualization allows for different levels of technology to be implemented or integrated. The key reason AWS has surpassed many of its competitors is for its plethora of services available for provisioning. IaaS, PaaS, and SaaS are all cloud based services due to the ambiguous nature of the definition, but IaaS is the most strictest form of the name. It is the service we used to deploy both ends of our application. 
+
+Various companies have put out their own definitions and we believe ours is consistent with theirs models. The differences lye in intentions and sources. The Cloud Service providers are very focused on economic side of cloud computing which phrases most options through a pricing model. Government agencies such as NIST give a highly particular and carefully considered definitions. Their verbage are taken to become the standard of the industry and must be well throughout. They neglect including the service providers or any third-party into the definition; promoting the more ambiguous nature of the concept while trying to keep everything technical. Meanwhile other companies like Cloudflare and IBM tend to use more neutral language and mention both sides. They want to promote the technical definition but also need to spread awareness of the providers and how to actually implement and use the concepts. 
+
+Businesses utilize the stricter form of Cloud Computing, while most people utilize the cloud without even recognizing it. The cloud has expanded to most fields of research and business. The cloud has great integrative potential with cutting edge research such as Blockchain, Cyber-Physical Systems, and IoT. In Blockchain the cloud is often supplemented for storage in a permissioned environment \cite{Wang}. In IoT, and CPS, the cloud is used to computing ex-filtrated data \cite{Wang2}. The ambiguity of the cloud allows for integration of various technology and then later implementation of various fields and disciplines. The blockchain-cloud architecture I mentioned between Medical Researchers and Hospital organizations. While the IoT and CPS integration were in Critical Infrastructure and Applied Cryptography research. The potential is endless, and I will be using it so I can do groceries.
+
+\begin{table*}[h!]
+\label{table:1}
+\normalsize
+\caption{Definitions of Cloud Computing}
+\centering
+\begin{tabular}{|| p{1in}|p{4.5in} ||}
+\hline\\
+Source  & Definition\\ [1ex]
+\hline  \hline 
+Tenzin & Cloud Computing is an ambiguous concept that only requires two key elements: Virtualization and the Internet. Other features or elements of the clouds are closer to components of the elements I already mentioned or effects from its technical nature. \\ [1ex] \hline
+NIST  & Cloud computing is a model for enabling ubiquitous, convenient, on-demand network access to a shared pool of configurable computing resources (e.g., networks, servers, storage, applications, and services) that can be rapidly provisioned and released with minimal management effort or service provider interaction. This cloud model is composed of five essential characteristics, three service models, and four deployment models. \\ [1ex] \hline
+Google & Cloud computing is the on-demand availability of computing resources as services over the internet. It eliminates the need for enterprises to procure, configure, or manage resources themselves, and they only pay for what they use.\\ [1ex] \hline
+Microsoft & Cloud computing is the delivery of computing services—including servers, storage, databases, networking, software, analytics, and intelligence—over the internet (“the cloud”) to offer faster innovation, flexible resources, and economies of scale. \\ [1ex] \hline
+Amazon & Cloud computing is the on-demand delivery of IT resources over the Internet with pay-as-you-go pricing\\ [1ex] \hline
+IBM & Cloud computing is on-demand access, via the internet, to computing resources—applications, servers (physical servers and virtual servers), data storage, development tools, networking capabilities, and more—hosted at a remote data center managed by a cloud services provider (or CSP). \\ [1ex] \hline
+CrowdStrike & Cloud infrastructure is a collective term used to refer to the various components that enable cloud computing and the delivery of cloud services to the customer. This includes hardware, software, network devices, data storage and an abstraction layer that allows users to access virtualized resources.\\ [1ex] \hline
+Cloudflare & The cloud" refers to servers that are accessed over the Internet, and the software and databases that run on those servers.  \\ [1ex] \hline
+\end{tabular}
+\label{table:1}
+\end{table*}
+
+\subsection{Initial Construction}
+Previously we have deployed an application relying on a front-end and a back-end api. This is a web application working on top of the python flask framework. The front-end code is deployed on a Kubernetes cluster making calls to the api on a seperate Google Cloud Platform (GCP) compute engine. The API then alters or sends back the requested tasks and the interaction ends with a GET call to display the database. The database is SQLite and the html is all in an index.html file. We have also automated the creation of the Web application. This is essential in pipelines outside the simulation. 
+\newpage
+\section{Method}
+We will first be testing the aforementioned application using Enumeration techniques, Static application security testing (SAST) and Dynamic application security test (DAST) tools and completing exploitations. These types of tests and tools help use be informed of vulnerabilities and next steps to our security program. So, we will be using the information we learned to secure our code, server, and more. Afterwards, we will have to test the security again for any changes.
+
+\section{Penetration Testing}
+\subsection{Enumeration}
+First, we will be gathering information on the GCP cloud from an outside perspective. For this I used Shodan. Since we have yet to add our server to any 
+DNS servers and lacks any DNS record, I suspected that we will not find much from this. I would also explore nmap more, but after initial scans, I didn't think anything interesting would come out of it. 
+
+Most of our predictions came to light. Enumeration tools were not useful since our application lacked network sophistication. It is a very simple layout and with simplicity there is security. Shodan can find the open ports for the API server and from that we can inquire our main source of access: ssh \ref{subsec:S1}. Shodan also captured more information about the server itself and ssh-key. They knew we were running Ubuntu servers and the various encryption algorithms used for ssh-rsa \ref{subsec:S2}. However they were unable to detect the open 5001 port. Nmap however, notices that 5001 port was indeed open but the service running on it was \textit{commlexlink}. The port 5001 has been exploited before in CVE-2019-6139. In the future we can explore nmap and nmap scripting engine options. We were not able to find any information about the front-end server.
+
+\subsection{SAST}
+For our SAST tool we will be using Bandit. Bandit is open source and can scan for code logic and vulnerabilities of any repository. I suspected that we would find a lot of information here. Since Bandit will scan the entire repository both front-end and back-end code will be analysed. Bandit We utilize results to inform our mitigation strategies and future recommendations. 
+Bandit and ZAP carried a lot of the weight in findings. Bandit displayed various issues with the code such as ignored standard coding practices, and improper SQL coding. Informed by their OSINT databases, they also listed the severity and their confidence in the matter. Key things to note for section \ref{sec:M} is to implement request timeouts for calls, the various SQL vectors and finally interface binding. 
+\subsection{DAST}
+Our DAST tool of choice is OWASP ZAP. This is a versatile open source tool with its own GUI. It is able to web crawl, scan, and attack with its various penetration testing modes. Furthermore, we can utilize different spiders to crawl leading to different potential vulnerabilities. We will be using both traditional and ajax spider. Ajax may perform better on modern web applications, while traditional spider has been the conventional method. OWASP top-ten has been famous for listing the greatest threat to contemporary systems. We used the ZAP tool of the front-end server, attempting to find vulnerabilities. I suspect that we will be able to find and exploit most of them---maybe even taking down the application. 
+
+Zap, then took it a step further and scanned the running service. The input was the front-end server IP-address. Zap, first, crawls through the server using traditional spider tools, and finds weak points. Zap was able to find 10 alerts on the running server. Zap also, initiated the attacks that it listed. The most prominent being Cross-site-scripting (XSS) attack. The attack is a nuisance on users and can undermine availability. The XSS this time only used alert, but it can get more persistent and annoying. Persitent XSS can exploit GET requests while Reflected XSS can exploit POST requests. A scripting attack on the server can make it almost unusable. People trying to complete their groceries list will have to deal with unwanted texts and sometimes even voice messages. Since its an arbitrary attack, any key functions are fair game.
+
+\begin{table*}[h!]
+\label{table:1}
+\normalsize
+\caption{OWAS ZAP Tool Traditional Spider Results}
+\centering
+\begin{tabular}{||c c c c||} 
+\hline\\
+Alert Type & Risk & Count & Ajax Count\\ [1ex]
+\hline  \hline 
+XSS (Persistent) & High & 2 & 2 \\ \hline
+XSS (Reflected)  & High & 2 & 2\\ \hline
+Absence of Anti-CSRF Token & Medium & 2 & 2\\ \hline
+Content Security Policy (CSP) Header Not Set & Medium & 4 & 38\\ \hline
+Missing Anti-clickjacking Header & Medium & 2 & 2 \\ \hline
+Cross-Domain JS Source File Inclusion & Low & 4 & 4 \\ \hline
+Server Leaks Version Information & Low & 5 & 65  \\ [1ex] \hline
+X-Content-Type-Options Header Missing & Low & 2  & 2\\ [1ex] \hline
+User Agent Fuzzing & Informational & 36  & 2468\\ [1ex] \hline
+Modern Web Application & Informational & 2 & 2 \\ [1ex] \hline
+\end{tabular}
+\label{table:1}
+\end{table*}
+Although ZAP simultaneously attacks as well, we will also use another tool called sqlmap. SQLmap is a autonomous SQL injection tool that can go through various levels of attack depth and risk. we can attack nosily by brute force to five levels and risk can go up to 3 levels.
+Finally, we were not successful in the SQLmap attempt. We maximized for attack and created a lot of noise on the server. However, we did not get any successful results. I believe it is because SQLmap is meant for more sophisticated application of databases. Here we had no login information, and any sensitive information of our data. 
+
+\section{Discussion}
+\label{sec:M}
+Our SAST and DAST tools were giving opposing views on vulnerabilities. While SAST results were focused on SQLi and improper handles, DAST detected various XSS and other Header standards. One is not better than the other. While DAST is useful for securing the code we need to now, SAST can be better for long term implementation. We will need to constantly utilize both for future security. Especially if we were to scale up, we will have to address they're issue. Here are some ways we may be able to solve the issues.
+\subsection{Sanitation}
+Although our main goal was 
+For mitigation lets first explore flask for more solutions. Since a lot of our vulnerability happens to be in improper headers, we can start there. Content Security Policy provides a layer of security against cross-site scripting attack. There is a flask module named \textit{flask\_csp} where we can implement csp rules. In our case we used the default source and script source at any POST requests \ref{CSP}. I also implemented a X-Frame rule in order to avoid other nuisance like clickjacking. These headers will be useful against OWASP ZAP. 
+
+I also implemented some timeout rules. However after another bandit scan, it seems like there is an SSL certification issues \ref{ban2}. However, in our particular use case it will not matter as much as the application hanging. Time out rules are useful against servers that refuse to make a connection and let you hang. Instead of taking resources, we can try again. However, in the future we will have to patch the problem and implement proper SSL verification. 
+\section{Future Work}
+\begin{itemize}
+    \item Thorough Sanitation on all levels. I tried to apply a simple one that removes some SQL verage that was successful in the attacks but it is only rudimentary \ref{code}. It is sometimes this simple to avoid SQLi since most attacks are useless without the key phrases. This can be further sanitized by making some inputs date only and so forth. In most inputs, buisnesses only allow you to type characters so they can avoid '*' attempts. 
+\item Add Anti-CSRF Token
+\item Have security monitoring alerts. Utilize tools such as SUMOLOGIC and Splunk
+\item Bind only needed interfaces 
+\item As you scale implement good DevSecOps Principles 
+\end{itemize}
+
+\section{Conclusion}
+We have gone through Penetration tools and concluded that XSS is the most prominent threat to the application. Other security threats are more long term and issues from scalability. Both SAST and DAST tools were able to detect the vulnerabilities but were very loud in doing so. The Cloud monitoring tools detected all the noise with error logs. We were able to mitigate XSS threats with CPS and X-Frame options. The Cloud does not change security for application without it. The cloud service providers  are not responsible for your poor coding practices. They try their best to accommodate for security capacities, but security is still not out sourced to the cloud completely. I have gone through the process of determining security threats from the ground up. If the purpose of the application re-frames then we have to adjust our security. If the application is used by multiple people, then we need accounts. Then our focus in security shifts. Consitent Penetration testing and security monitoring is important. Security is a process and the process is to keep the application running as indented. Security is as meaningful as the purpose of the application---aim for usable security, not perfect security
+
+
+\begin{thebibliography}{1} %nb de références possibles : 15
+\bibitem{Block} Y. Wang, A. Zhang, P. Zhang and H. Wang, "Cloud-Assisted EHR Sharing With Security and Privacy Preservation via Consortium Blockchain," in IEEE Access, vol. 7, pp. 136704-136719, 2019, doi: 10.1109/ACCESS.2019.2943153.
+\bibitem{Wang2}Wang Ren, Xin Tong, Jing Du, Na Wang, Shan Cang Li, Geyong Min, Zhiwei Zhao, Ali Kashif Bashir, Privacy-preserving using homomorphic encryption in Mobile IoT systems,
+Computer Communications, Volume 165, 2021, Pages 105-111, ISSN 0140-3664, https://doi.org/10.1016/j.comcom.2020.10.022.
+
+\end{thebibliography}
+
+\appendix
+\section{Information from Shodan}
+\label{sec:S}
+\subsection{General Information}
+\label{subsec:S1}
+\centering
+\includegraphics{shodan.png}
+\subsection{OpenSSH7.6p1 Ubuntu-4ubuntu0.5}
+\label{subsec:S2}
+\begin{mdframed}
+\begin{itemize}
+\item  SSH-2.0-OpenSSH\_7.6p1 Ubuntu-4ubuntu0.5
+\item Key type: ssh-rsa
+\item Key: 
+\begin{itemize}
+    \item[] AAAAB3NzaC1yc2EAAAADAQABAAABAQCgb4F+9o5N5J\\
+/cAkaXa6HBW1WL8lPCI6cxsWG\\
+/WsRoPb7Ih+XptHInIhFldQwHM+D1\\
+/3yZcClepX6xhXRLlY+lXciqx\\
+/5RCyeB2Y\\
+/h8gz3kUkqW+X/o/D\\
+/hiPROCQW+rXhO98IxGrO4zc9whB3xpJecvnS\\
+/ESI1rAxgYDY+hzTJQrWDrGXfpn6\\
+/gCxFKj9dm9nhAbtLyTTYIVOifsDD0K55bqBLhlp\\
+DaltXUvuN1iGr6M9mFn7yHyGZ36xlKH5h6Jqf4eAgINtxTje\\
+/EReykxYR0CqZSwZBBbD\\
+/vhnnnd7e13Wquxs8vSdnZ6jW\\
+/sW5QXYH+Meya5JK9S3KRBdFq3h
+\end{itemize}
+
+\item Fingerprint: 
+\begin{itemize}
+    \item 0b:34:88:1e:02:c7:3a:10:78:68:8d:8e:2b:7a:5c:c6
+\end{itemize}
+
+\item Kex Algorithms: 
+\begin{itemize}
+	\item curve25519-sha256
+	\item curve25519-sha256@libssh.org
+	\item ecdh-sha2-nistp256
+	\item ecdh-sha2-nistp384
+	\item ecdh-sha2-nistp521
+	\item diffie-hellman-group-exchange-sha256
+	\item diffie-hellman-group16-sha512
+	\item diffie-hellman-group18-sha512
+	\item diffie-hellman-group14-sha256
+	\item diffie-hellman-group14-sha1
+\end{itemize}
+
+\item Server Host Key Algorithms:
+\begin{itemize}
+    \item ssh-rsa,
+	\item rsa-sha2-512,
+	\item rsa-sha2-256,
+	\item ecdsa-sha2-nistp256,
+	\item ssh-ed25519
+\end{itemize}
+
+\item Encryption Algorithms:
+\begin{itemize}
+    \item chacha20-poly1305@openssh.com,
+	\item aes128-ctr,
+	\item aes192-ctr,
+	\item aes256-ctr,
+	\item aes128-gcm@openssh.com,
+	\item aes256-gcm@openssh.com
+\end{itemize}
+	
+\item MAC Algorithms:
+\begin{itemize}
+    \item umac-64-etm@openssh.com,
+	\item umac-128-etm@openssh.com,
+	\item hmac-sha2-256-etm@openssh.com,
+	\item hmac-sha2-512-etm@openssh.com,
+	\item hmac-sha1-etm@openssh.com,
+	\item umac-64@openssh.com,
+	\item umac-128@openssh.com,
+	\item hmac-sha2-256,
+	\item hmac-sha2-512,
+	\item hmac-sha1,
+\end{itemize}
+	
+\item Compression Algorithms
+\begin{itemize}
+    \item none
+    \item zlib@openssh.com
+\end{itemize}
+\end{itemize}
+\end{mdframed}
+
+\section{Bandit Output}
+\subsection{last Bandit}
+\label{ban1}
+\VerbatimInput{newTarget}
+\subsection{More Secure Bandit}
+\label{ban2}
+\VerbatimInput{Target.txt}
+
+\section{OWASP Output}
+\subsection{Application During the Attack}
+\includegraphics[scale=.5]{after.png}
+\subsection{Successful XSS}
+\label{sub:X}
+\centering
+\includegraphics[scale=.5]{crosssite-scripting.png}
+\subsection{OWSP Spiders}
+\includegraphics[scale=.5]{traditional.png}
+\includegraphics[scale=.5]{jax.png}
+\section{SQLMap Output}
+\begin{mdframed}
+    \begin{itemize}
+    \item http://35.229.57.63/add (POST)  \\\# /usr/bin/sqlmap -u http://35.229.57.63/ --batch --banner --random-agent --forms --crawl=2 --level=5 --risk=3
+    \item what\_to\_do=more homework%3F&due_date=dCkl
+\end{itemize}
+\end{mdframed}
+\section{Logs}
+\centerline{\includegraphics[scale=.6]{Logs.png}}
+
+\section{Sanitizing My Groceries}
+\subsection{CSP and new time out}
+\label{CSP}
+\begin{mdframed}
+\lstinputlisting[language=Python, firstline=31, lastline=43]{NFrntTodolist.py}
+\end{mdframed}
+
+\subsection{Sanitization}
+\label{code}
+\begin{mdframed}
+    \lstinputlisting[language=Python, firstline=16, lastline=21]{NFrntTodolist.py}
+\end{mdframed}
+
+\subsection{X-Frame}
+\label{X}
+\begin{mdframed}
+    \lstinputlisting[language=Python, firstline=56, lastline=59]{NFrntTodolist.py}
+\end{mdframed}
+Please Let me know if you would like more then the snippet I have provided for the source code or the complete ZAP report which is in HTML.
+\end{document}
+
